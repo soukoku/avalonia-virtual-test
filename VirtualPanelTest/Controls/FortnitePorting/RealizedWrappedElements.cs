@@ -8,7 +8,8 @@ namespace VirtualPanelTest.Controls.FortnitePorting;
 
 /// <summary>
 /// Stores the realized element state for a virtualizing panel that arranges its children
-/// in a stack layout, continuing on the next line when layout reaches the end, such as <see cref="VirtualizingWrapPanel"/>.
+/// in a stack layout, continuing on the next line when layout reaches the end,
+/// such as <see cref="VirtualizingWrapPanel"/>.
 /// </summary>
 internal class RealizedWrappedElements
 {

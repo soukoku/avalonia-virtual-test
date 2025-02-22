@@ -3,10 +3,17 @@
 // 
 // Licensed to The Avalonia Project under MIT License, courtesy of The .NET Foundation.
 
+using System.Diagnostics;
 using Avalonia.Layout;
 
 namespace VirtualPanelTest.Controls.FortnitePorting;
 
+ /// <summary>
+ /// Used to not write sepearate code for horizontal and vertical orientation.
+ /// U is direction in line. (x if orientation is horizontal)
+ /// V is direction of lines. (y if orientation is horizonral)
+ /// </summary>
+ [DebuggerDisplay("U = {U} V = {V}")]
 internal struct UVSize
 {
     internal UVSize(Orientation orientation, double width, double height)
