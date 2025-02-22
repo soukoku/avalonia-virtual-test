@@ -1,15 +1,29 @@
+using System.Diagnostics;
 using Avalonia.Media;
 
 namespace VirtualPanelTest.ViewModels;
 
 public class ItemViewModel : ViewModelBase
 {
-    public string Name { get; }
+    private string _category;
+
+    private string _name;
+
+    public string Name
+    {
+        get
+        {
+            Debug.WriteLine($"{_category} get name: {_name}");
+            return _name;
+        }
+    }
+
     public IImmutableSolidColorBrush Color { get; }
 
-    public ItemViewModel(string name, IImmutableSolidColorBrush color)
+    public ItemViewModel(string category, string name, IImmutableSolidColorBrush color)
     {
-        Name = name;
+        _category = category;
+        _name = name;
         Color = color;
     }
 }

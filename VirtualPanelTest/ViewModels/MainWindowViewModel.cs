@@ -11,11 +11,14 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         foreach (var prop in typeof(Brushes).GetProperties(BindingFlags.Public | BindingFlags.Static))
         {
-            Items.Add(new ItemViewModel(prop.Name, (IImmutableSolidColorBrush)prop.GetValue(null)!));
+            StandardItems.Add(new ItemViewModel("std", prop.Name, (IImmutableSolidColorBrush)prop.GetValue(null)!));
+            FortnitePortingItems.Add(new ItemViewModel("fp", prop.Name, (IImmutableSolidColorBrush)prop.GetValue(null)!));
+            AnotherItems.Add(new ItemViewModel("other", prop.Name, (IImmutableSolidColorBrush)prop.GetValue(null)!));
         }
     }
 
-    public ObservableCollection<ItemViewModel> Items { get; } = [];
-
-    public string Greeting { get; } = "Welcome to Avalonia!";
+    public ObservableCollection<ItemViewModel> StandardItems { get; } = [];
+    
+    public ObservableCollection<ItemViewModel> FortnitePortingItems { get; } = [];
+    public ObservableCollection<ItemViewModel> AnotherItems { get; } = [];
 }
