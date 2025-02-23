@@ -217,11 +217,13 @@ public class VirtualizingWrapPanel : VirtualizingPanel
                 _realizedElements.ItemsInserted(e.NewStartingIndex, e.NewItems!.Count, _updateElementIndex);
                 break;
             case NotifyCollectionChangedAction.Remove:
-                _realizedElements.ItemsRemoved(e.OldStartingIndex, e.OldItems!.Count, _updateElementIndex, _recycleElementOnItemRemoved);
+                _realizedElements.ItemsRemoved(e.OldStartingIndex, e.OldItems!.Count, _updateElementIndex,
+                    _recycleElementOnItemRemoved);
                 break;
             case NotifyCollectionChangedAction.Replace:
             case NotifyCollectionChangedAction.Move:
-                _realizedElements.ItemsRemoved(e.OldStartingIndex, e.OldItems!.Count, _updateElementIndex, _recycleElementOnItemRemoved);
+                _realizedElements.ItemsRemoved(e.OldStartingIndex, e.OldItems!.Count, _updateElementIndex,
+                    _recycleElementOnItemRemoved);
                 _realizedElements.ItemsInserted(e.NewStartingIndex, e.NewItems!.Count, _updateElementIndex);
                 break;
             case NotifyCollectionChangedAction.Reset:
@@ -240,7 +242,7 @@ public class VirtualizingWrapPanel : VirtualizingPanel
         var horiz = Orientation == Orientation.Horizontal;
         var fromIndex = from != null ? IndexFromContainer(fromControl) : -1;
         var toIndex = fromIndex;
-
+        
         switch (direction)
         {
             case NavigationDirection.First:
@@ -258,18 +260,43 @@ public class VirtualizingWrapPanel : VirtualizingPanel
             case NavigationDirection.Left:
                 if (horiz)
                     --toIndex;
+                else if (_realizedElements is { SizeUV.U: > 0 })
+                {
+                    var nextLineCount = (int)Math.Floor(_viewport.Width / _realizedElements.SizeUV.U);
+                    var newIdx = toIndex - nextLineCount;
+                    if (newIdx >= 0) toIndex = newIdx;
+                }
+
                 break;
             case NavigationDirection.Right:
                 if (horiz)
                     ++toIndex;
+                else if (_realizedElements is { SizeUV.U: > 0 })
+                {
+                    var nextLineCount = (int)Math.Floor(_viewport.Width / _realizedElements.SizeUV.U);
+                    var newIdx = toIndex + nextLineCount;
+                    if (newIdx < count) toIndex = newIdx;
+                }
                 break;
             case NavigationDirection.Up:
                 if (!horiz)
                     --toIndex;
+                else if (_realizedElements is { SizeUV.U: > 0 })
+                {
+                    var nextLineCount = (int)Math.Floor(_viewport.Width / _realizedElements.SizeUV.U);
+                    var newIdx = toIndex - nextLineCount;
+                    if (newIdx >= 0) toIndex = newIdx;
+                }
                 break;
             case NavigationDirection.Down:
                 if (!horiz)
                     ++toIndex;
+                else if (_realizedElements is { SizeUV.U: > 0 })
+                {
+                    var nextLineCount = (int)Math.Floor(_viewport.Width / _realizedElements.SizeUV.U);
+                    var newIdx = toIndex + nextLineCount;
+                    if (newIdx < count) toIndex = newIdx;
+                }
                 break;
             default:
                 return null;
@@ -338,10 +365,13 @@ public class VirtualizingWrapPanel : VirtualizingPanel
             _scrollToIndex = index;
 
             var viewport = _viewport != s_invalidViewport ? _viewport : EstimateViewport();
-            var viewportEnd = Orientation == Orientation.Horizontal ? new UVSize(Orientation, viewport.Right, viewport.Bottom) : new UVSize(Orientation, viewport.Bottom, viewport.Right);
+            var viewportEnd = Orientation == Orientation.Horizontal
+                ? new UVSize(Orientation, viewport.Right, viewport.Bottom)
+                : new UVSize(Orientation, viewport.Bottom, viewport.Right);
 
             // Get the expected position of the element and put it in place.
-            var anchorUV = _realizedElements.GetOrEstimateElementUV(index, ref _lastEstimatedElementSizeUV, viewportEnd);
+            var anchorUV =
+                _realizedElements.GetOrEstimateElementUV(index, ref _lastEstimatedElementSizeUV, viewportEnd);
             size = new Size(isItemWidthSet ? itemWidth : _scrollToElement.DesiredSize.Width,
                 isItemHeightSet ? itemHeight : _scrollToElement.DesiredSize.Height);
             var rect = new Rect(anchorUV.Width, anchorUV.Height, size.Width, size.Height);
@@ -461,8 +491,8 @@ public class VirtualizingWrapPanel : VirtualizingPanel
         {
             // Since ItemWidth and ItemHeight are set, we simply compute the actual size
             var uLength = viewport.viewportUVEnd.U;
-            var estimatedItemsPerU = (int) (uLength / estimatedSize.U);
-            var estimatedULanes = Math.Ceiling((double) itemCount / estimatedItemsPerU);
+            var estimatedItemsPerU = (int)(uLength / estimatedSize.U);
+            var estimatedULanes = Math.Ceiling((double)itemCount / estimatedItemsPerU);
             sizeUV.U = estimatedItemsPerU * estimatedSize.U;
             sizeUV.V = estimatedULanes * estimatedSize.V;
         }
@@ -635,7 +665,7 @@ public class VirtualizingWrapPanel : VirtualizingPanel
             if (uv.U < viewport.viewportUVStart.U)
             {
                 var uLength = viewport.viewportUVEnd.U - viewport.viewportUVStart.U;
-                var uConstraint = (int) (uLength / size.U) * size.U;
+                var uConstraint = (int)(uLength / size.U) * size.U;
                 uv.U = uConstraint - size.U;
                 uv.V -= size.V;
             }
